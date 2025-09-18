@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DC Motor Parameter Calculator - ENTC</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #2563eb;
+            --primary-blue-light: #3b82f6;
+            --primary-blue-dark: #1d4ed8;
+            --secondary-teal: #0d9488;
+            --secondary-teal-light: #14b8a6;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+            --neutral-gray-50: #f9fafb;
+            --neutral-gray-100: #f3f4f6;
+            --neutral-gray-200: #e5e7eb;
+            --neutral-gray-300: #d1d5db;
+            --neutral-gray-400: #9ca3af;
+            --neutral-gray-500: #6b7280;
+            --neutral-gray-600: #4b5563;
+            --neutral-gray-700: #374151;
+            --neutral-gray-800: #1f2937;
+            --neutral-gray-900: #111827;
+            --success-green: #10b981;
+            --warning-yellow: #f59e0b;
+            --error-red: #ef4444;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --border-radius: 12px;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--neutral-gray-800);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header Styles */
+        .header {
+            background: var(--surface);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--neutral-gray-200);
+        }
+
+        .header-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-icon {
+            font-size: 3rem;
+            color: var(--primary-blue);
+            animation: rotate 6s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--neutral-gray-800);
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: var(--neutral-gray-600);
+            font-weight: 500;
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--surface);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--neutral-gray-200);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            color: var(--neutral-gray-800);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card h2 i {
+            color: var(--primary-blue);
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: var(--neutral-gray-700);
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--neutral-gray-300);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+            background: var(--neutral-gray-50);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            background: var(--surface);
+            box-shadow: 0 0 0 3px rgb(37 99 235 / 0.1);
+        }
+
+        .form-control:invalid {
+            border-color: var(--error-red);
+        }
+
+        /* Grid Layout */
+        .parameters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .parameter-section {
+            background: var(--neutral-gray-50);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--neutral-gray-200);
+        }
+
+        .parameter-section h3 {
+            color: var(--neutral-gray-800);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.2rem;
+        }
+
+        .parameter-section h3 i {
+            color: var(--secondary-teal);
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-blue-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background: var(--neutral-gray-200);
+            color: var(--neutral-gray-700);
+        }
+
+        .btn-secondary:hover {
+            background: var(--neutral-gray-300);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 25px 0;
+        }
+
+        /* Motor Info Styles */
+        .motor-info {
+            background: linear-gradient(135deg, var(--primary-blue-light), var(--secondary-teal));
+            color: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            margin-top: 20px;
+        }
+
+        .motor-info h3 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+        }
+
+        .motor-info p {
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .characteristics, .applications {
+            margin-bottom: 15px;
+        }
+
+        .characteristics h4, .applications h4 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+
+        .characteristics ul, .applications ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .characteristics li, .applications li {
+            padding: 5px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .characteristics li:before, .applications li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        /* Results Styles */
+        .results-section {
+            background: linear-gradient(135deg, var(--success-green), var(--secondary-teal-light));
+            color: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            margin-top: 20px;
+        }
+
+        .result-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 15px 0;
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+
+        .calculation-steps {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .calculation-steps h4 {
+            margin-bottom: 15px;
+            color: #ffffff;
+        }
+
+        .step {
+            margin-bottom: 10px;
+            font-family: 'Courier New', monospace;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 12px;
+            border-radius: 4px;
+        }
+
+        /* Error Styles */
+        .error {
+            background: var(--error-red);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-20 {
+            margin-top: 20px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .parameters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+        }
+
+        /* Tooltip Styles */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 250px;
+            background-color: var(--neutral-gray-800);
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -125px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: var(--neutral-gray-800) transparent transparent transparent;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Animation for loading */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <header class="header">
+            <div class="header-content">
+                <i class="fas fa-cog header-icon"></i>
+                <h1>DC Motor Parameter Calculator</h1>
+                <p>Advanced ENTC Engineering Tool</p>
+            </div>
+        </header>
+
+        <!-- Motor Type Selection -->
+        <div class="card motor-selection">
+            <h2><i class="fas fa-bolt"></i> Motor Type Selection</h2>
+            <div class="form-group">
+                <label for="motorType" class="form-label">Select Motor Type:</label>
+                <select id="motorType" class="form-control">
+                    <option value="">Choose Motor Type</option>
+                    <option value="shunt">DC Shunt Motor</option>
+                    <option value="series">DC Series Motor</option>
+                </select>
+            </div>
+            <div id="motorInfo" class="motor-info hidden">
+                <h3 id="motorName"></h3>
+                <p id="motorDesc"></p>
+                <div class="characteristics">
+                    <h4>Key Characteristics:</h4>
+                    <ul id="motorCharacteristics"></ul>
+                </div>
+                <div class="applications">
+                    <h4>Applications:</h4>
+                    <ul id="motorApplications"></ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Parameter Input Sections -->
+        <div class="parameters-grid" id="parametersGrid" style="display: none;">
+            <!-- Electrical Parameters -->
+            <div class="card parameter-section">
+                <h3><i class="fas fa-plug"></i> Electrical Parameters</h3>
+                <div class="form-group">
+                    <label for="voltage" class="form-label tooltip">Terminal Voltage (V)
+                        <span class="tooltiptext">The voltage applied to the motor terminals</span>
+                    </label>
+                    <input type="number" id="voltage" class="form-control" placeholder="Enter voltage in volts" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label for="armatureCurrent" class="form-label tooltip">Armature Current (Ia)
+                        <span class="tooltiptext">Current flowing through the armature winding</span>
+                    </label>
+                    <input type="number" id="armatureCurrent" class="form-control" placeholder="Enter current in amperes" step="0.1">
+                </div>
+                <div class="form-group" id="fieldCurrentGroup">
+                    <label for="fieldCurrent" class="form-label tooltip">Field Current (If)
+                        <span class="tooltiptext">Current flowing through the field winding (Shunt motor only)</span>
+                    </label>
+                    <input type="number" id="fieldCurrent" class="form-control" placeholder="Enter field current in amperes" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label for="armatureResistance" class="form-label tooltip">Armature Resistance (Ra)
+                        <span class="tooltiptext">Resistance of the armature winding in ohms</span>
+                    </label>
+                    <input type="number" id="armatureResistance" class="form-control" placeholder="Enter resistance in ohms" step="0.01">
+                </div>
+                <div class="form-group" id="fieldResistanceGroup">
+                    <label for="fieldResistance" class="form-label tooltip">Field Resistance (Rf)
+                        <span class="tooltiptext">Resistance of the field winding in ohms</span>
+                    </label>
+                    <input type="number" id="fieldResistance" class="form-control" placeholder="Enter field resistance in ohms" step="0.01">
+                </div>
+                <div class="form-group hidden" id="seriesResistanceGroup">
+                    <label for="seriesResistance" class="form-label tooltip">Series Resistance (Rse)
+                        <span class="tooltiptext">Series field resistance in ohms (Series motor only)</span>
+                    </label>
+                    <input type="number" id="seriesResistance" class="form-control" placeholder="Enter series resistance in ohms" step="0.01">
+                </div>
+            </div>
+
+            <!-- Mechanical Parameters -->
+            <div class="card parameter-section">
+                <h3><i class="fas fa-gear"></i> Mechanical Parameters</h3>
+                <div class="form-group">
+                    <label for="mechanicalPower" class="form-label tooltip">Mechanical Power (Pmech)
+                        <span class="tooltiptext">Useful mechanical power output of the motor</span>
+                    </label>
+                    <input type="number" id="mechanicalPower" class="form-control" placeholder="Enter power in watts" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label for="torque" class="form-label tooltip">Torque (T)
+                        <span class="tooltiptext">Rotational force produced by the motor</span>
+                    </label>
+                    <input type="number" id="torque" class="form-control" placeholder="Enter torque in N-m" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="speed" class="form-label tooltip">Speed (N)
+                        <span class="tooltiptext">Rotational speed of the motor shaft</span>
+                    </label>
+                    <input type="number" id="speed" class="form-control" placeholder="Enter speed in RPM" step="1">
+                </div>
+                <div class="form-group">
+                    <label for="backEmf" class="form-label tooltip">Back EMF (Eb)
+                        <span class="tooltiptext">Voltage generated by the rotating armature</span>
+                    </label>
+                    <input type="number" id="backEmf" class="form-control" placeholder="Enter back EMF in volts" step="0.1">
+                </div>
+            </div>
+
+            <!-- Motor Construction -->
+            <div class="card parameter-section">
+                <h3><i class="fas fa-tools"></i> Motor Construction</h3>
+                <div class="form-group">
+                    <label for="poles" class="form-label tooltip">Number of Poles (P)
+                        <span class="tooltiptext">Total number of magnetic poles in the motor</span>
+                    </label>
+                    <input type="number" id="poles" class="form-control" placeholder="Enter number of poles" step="1" min="2">
+                </div>
+                <div class="form-group">
+                    <label for="conductors" class="form-label tooltip">Number of Conductors (Z)
+                        <span class="tooltiptext">Total number of armature conductors</span>
+                    </label>
+                    <input type="number" id="conductors" class="form-control" placeholder="Enter number of conductors" step="1">
+                </div>
+                <div class="form-group">
+                    <label for="parallelPaths" class="form-label tooltip">Parallel Paths (A)
+                        <span class="tooltiptext">Number of parallel paths in armature winding</span>
+                    </label>
+                    <input type="number" id="parallelPaths" class="form-control" placeholder="Enter parallel paths" step="1" min="1">
+                </div>
+                <div class="form-group">
+                    <label for="flux" class="form-label tooltip">Flux per Pole (φ)
+                        <span class="tooltiptext">Magnetic flux per pole in webers</span>
+                    </label>
+                    <input type="number" id="flux" class="form-control" placeholder="Enter flux in webers" step="0.001">
+                </div>
+            </div>
+        </div>
+
+        <!-- Calculation Selection -->
+        <div class="card" id="calculationCard" style="display: none;">
+            <h2><i class="fas fa-calculator"></i> What do you want to calculate?</h2>
+            <div class="form-group">
+                <label for="calculateParameter" class="form-label">Select parameter to calculate:</label>
+                <select id="calculateParameter" class="form-control">
+                    <option value="">Choose parameter to calculate</option>
+                    <option value="backEmf">Back EMF (Eb)</option>
+                    <option value="mechanicalPower">Mechanical Power (Pmech)</option>
+                    <option value="torque">Torque (T)</option>
+                    <option value="speed">Speed (N)</option>
+                    <option value="armatureCurrent">Armature Current (Ia)</option>
+                    <option value="fieldCurrent">Field Current (If)</option>
+                </select>
+            </div>
+
+            <div class="btn-group">
+                <button id="calculateBtn" class="btn btn-primary">
+                    <i class="fas fa-play"></i> Calculate
+                </button>
+                <button id="resetBtn" class="btn btn-secondary">
+                    <i class="fas fa-refresh"></i> Reset
+                </button>
+                <button id="exampleBtn" class="btn btn-secondary">
+                    <i class="fas fa-lightbulb"></i> Load Example
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsCard" class="card hidden">
+            <div id="resultsContent"></div>
+        </div>
+
+        <!-- Error Display -->
+        <div id="errorCard" class="error hidden">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span id="errorMessage"></span>
+        </div>
+    </div>
+
+    <script>
+        // DC Motor Parameter Calculator - JavaScript
+        class DCMotorCalculator {
+            constructor() {
+                this.motorData = {
+                    "shunt": {
+                        "name": "DC Shunt Motor",
+                        "description": "Field winding connected in parallel with armature",
+                        "characteristics": [
+                            "Constant speed operation",
+                            "Low starting torque", 
+                            "Good speed regulation",
+                            "Field current independent of load"
+                        ],
+                        "applications": ["Fans", "Blowers", "Machine tools", "Printing machines"]
+                    },
+                    "series": {
+                        "name": "DC Series Motor",
+                        "description": "Field winding connected in series with armature", 
+                        "characteristics": [
+                            "Variable speed with load",
+                            "High starting torque",
+                            "Speed decreases with load", 
+                            "Same current through field and armature"
+                        ],
+                        "applications": ["Electric trains", "Cranes", "Hoists", "Electric vehicles"]
+                    }
+                };
+
+                this.examples = {
+                    "shunt": {
+                        voltage: 220,
+                        armatureResistance: 0.5,
+                        fieldResistance: 110,
+                        poles: 4,
+                        conductors: 400,
+                        parallelPaths: 2,
+                        speed: 1500,
+                        flux: 0.02
+                    },
+                    "series": {
+                        voltage: 230,
+                        armatureResistance: 0.3,
+                        seriesResistance: 0.2,
+                        poles: 4,
+                        conductors: 600,
+                        parallelPaths: 2,
+                        speed: 1200,
+                        flux: 0.015
+                    }
+                };
+
+                this.initializeElements();
+                this.attachEventListeners();
+            }
+
+            initializeElements() {
+                // Motor selection elements
+                this.motorTypeSelect = document.getElementById('motorType');
+                this.motorInfo = document.getElementById('motorInfo');
+                this.motorName = document.getElementById('motorName');
+                this.motorDesc = document.getElementById('motorDesc');
+                this.motorCharacteristics = document.getElementById('motorCharacteristics');
+                this.motorApplications = document.getElementById('motorApplications');
+
+                // Parameter sections
+                this.parametersGrid = document.getElementById('parametersGrid');
+                this.calculationCard = document.getElementById('calculationCard');
+
+                // Form elements
+                this.inputs = {
+                    voltage: document.getElementById('voltage'),
+                    armatureCurrent: document.getElementById('armatureCurrent'),
+                    fieldCurrent: document.getElementById('fieldCurrent'),
+                    armatureResistance: document.getElementById('armatureResistance'),
+                    fieldResistance: document.getElementById('fieldResistance'),
+                    seriesResistance: document.getElementById('seriesResistance'),
+                    mechanicalPower: document.getElementById('mechanicalPower'),
+                    torque: document.getElementById('torque'),
+                    speed: document.getElementById('speed'),
+                    backEmf: document.getElementById('backEmf'),
+                    poles: document.getElementById('poles'),
+                    conductors: document.getElementById('conductors'),
+                    parallelPaths: document.getElementById('parallelPaths'),
+                    flux: document.getElementById('flux')
+                };
+
+                // Groups for conditional display
+                this.fieldCurrentGroup = document.getElementById('fieldCurrentGroup');
+                this.fieldResistanceGroup = document.getElementById('fieldResistanceGroup');
+                this.seriesResistanceGroup = document.getElementById('seriesResistanceGroup');
+
+                // Calculation elements
+                this.calculateParameter = document.getElementById('calculateParameter');
+                this.calculateBtn = document.getElementById('calculateBtn');
+                this.resetBtn = document.getElementById('resetBtn');
+                this.exampleBtn = document.getElementById('exampleBtn');
+
+                // Results elements
+                this.resultsCard = document.getElementById('resultsCard');
+                this.resultsContent = document.getElementById('resultsContent');
+                this.errorCard = document.getElementById('errorCard');
+                this.errorMessage = document.getElementById('errorMessage');
+            }
+
+            attachEventListeners() {
+                this.motorTypeSelect.addEventListener('change', (e) => this.handleMotorTypeChange(e));
+                this.calculateBtn.addEventListener('click', () => this.calculate());
+                this.resetBtn.addEventListener('click', () => this.reset());
+                this.exampleBtn.addEventListener('click', () => this.loadExample());
+            }
+
+            handleMotorTypeChange(e) {
+                const motorType = e.target.value;
+
+                if (motorType) {
+                    this.showMotorInfo(motorType);
+                    this.showParameterInputs(motorType);
+                    this.parametersGrid.style.display = 'grid';
+                    this.calculationCard.style.display = 'block';
+                } else {
+                    this.hideMotorInfo();
+                    this.parametersGrid.style.display = 'none';
+                    this.calculationCard.style.display = 'none';
+                }
+
+                this.hideResults();
+                this.hideError();
+            }
+
+            showMotorInfo(motorType) {
+                const motor = this.motorData[motorType];
+                this.motorName.textContent = motor.name;
+                this.motorDesc.textContent = motor.description;
+
+                this.motorCharacteristics.innerHTML = '';
+                motor.characteristics.forEach(char => {
+                    const li = document.createElement('li');
+                    li.textContent = char;
+                    this.motorCharacteristics.appendChild(li);
+                });
+
+                this.motorApplications.innerHTML = '';
+                motor.applications.forEach(app => {
+                    const li = document.createElement('li');
+                    li.textContent = app;
+                    this.motorApplications.appendChild(li);
+                });
+
+                this.motorInfo.classList.remove('hidden');
+            }
+
+            hideMotorInfo() {
+                this.motorInfo.classList.add('hidden');
+            }
+
+            showParameterInputs(motorType) {
+                if (motorType === 'shunt') {
+                    this.fieldCurrentGroup.style.display = 'block';
+                    this.fieldResistanceGroup.style.display = 'block';
+                    this.seriesResistanceGroup.classList.add('hidden');
+                } else if (motorType === 'series') {
+                    this.fieldCurrentGroup.style.display = 'none';
+                    this.fieldResistanceGroup.style.display = 'none';
+                    this.seriesResistanceGroup.classList.remove('hidden');
+                }
+            }
+
+            calculate() {
+                const motorType = this.motorTypeSelect.value;
+                const calculateParam = this.calculateParameter.value;
+
+                if (!motorType || !calculateParam) {
+                    this.showError('Please select motor type and parameter to calculate');
+                    return;
+                }
+
+                const values = this.getInputValues();
+
+                try {
+                    const result = this.performCalculation(motorType, calculateParam, values);
+                    this.showResults(result, calculateParam, motorType);
+                } catch (error) {
+                    this.showError(error.message);
+                }
+            }
+
+            getInputValues() {
+                const values = {};
+                for (const [key, input] of Object.entries(this.inputs)) {
+                    const value = parseFloat(input.value);
+                    if (!isNaN(value)) {
+                        values[key] = value;
+                    }
+                }
+                return values;
+            }
+
+            performCalculation(motorType, calculateParam, values) {
+                const steps = [];
+                let result = 0;
+                let formula = '';
+
+                switch (calculateParam) {
+                    case 'backEmf':
+                        if (!values.poles || !values.flux || !values.conductors || !values.speed || !values.parallelPaths) {
+                            throw new Error('Required parameters: Poles (P), Flux (φ), Conductors (Z), Speed (N), Parallel Paths (A)');
+                        }
+                        formula = 'Eb = (P × φ × Z × N) / (60 × A)';
+                        result = (values.poles * values.flux * values.conductors * values.speed) / (60 * values.parallelPaths);
+                        steps.push(`Eb = (${values.poles} × ${values.flux} × ${values.conductors} × ${values.speed}) / (60 × ${values.parallelPaths})`);
+                        steps.push(`Eb = ${result.toFixed(3)} V`);
+                        break;
+
+                    case 'mechanicalPower':
+                        if (!values.backEmf || !values.armatureCurrent) {
+                            throw new Error('Required parameters: Back EMF (Eb) and Armature Current (Ia)');
+                        }
+                        formula = 'Pmech = Eb × Ia';
+                        result = values.backEmf * values.armatureCurrent;
+                        steps.push(`Pmech = ${values.backEmf} × ${values.armatureCurrent}`);
+                        steps.push(`Pmech = ${result.toFixed(3)} W`);
+                        break;
+
+                    case 'torque':
+                        if (!values.poles || !values.conductors || !values.parallelPaths || !values.flux || !values.armatureCurrent) {
+                            throw new Error('Required parameters: Poles (P), Conductors (Z), Parallel Paths (A), Flux (φ), Armature Current (Ia)');
+                        }
+                        formula = 'T = (P × Z / (2π × A)) × φ × Ia';
+                        result = (values.poles * values.conductors / (2 * Math.PI * values.parallelPaths)) * values.flux * values.armatureCurrent;
+                        steps.push(`T = (${values.poles} × ${values.conductors} / (2π × ${values.parallelPaths})) × ${values.flux} × ${values.armatureCurrent}`);
+                        steps.push(`T = ${result.toFixed(3)} N-m`);
+                        break;
+
+                    case 'speed':
+                        if (!values.backEmf || !values.poles || !values.flux || !values.conductors || !values.parallelPaths) {
+                            throw new Error('Required parameters: Back EMF (Eb), Poles (P), Flux (φ), Conductors (Z), Parallel Paths (A)');
+                        }
+                        formula = 'N = (Eb × 60 × A) / (P × φ × Z)';
+                        result = (values.backEmf * 60 * values.parallelPaths) / (values.poles * values.flux * values.conductors);
+                        steps.push(`N = (${values.backEmf} × 60 × ${values.parallelPaths}) / (${values.poles} × ${values.flux} × ${values.conductors})`);
+                        steps.push(`N = ${result.toFixed(0)} RPM`);
+                        break;
+
+                    case 'armatureCurrent':
+                        if (motorType === 'shunt') {
+                            if (!values.voltage || !values.backEmf || !values.armatureResistance) {
+                                throw new Error('Required parameters: Voltage (V), Back EMF (Eb), Armature Resistance (Ra)');
+                            }
+                            formula = 'Ia = (V - Eb) / Ra';
+                            result = (values.voltage - values.backEmf) / values.armatureResistance;
+                            steps.push(`Ia = (${values.voltage} - ${values.backEmf}) / ${values.armatureResistance}`);
+                        } else {
+                            if (!values.voltage || !values.backEmf || !values.armatureResistance || !values.seriesResistance) {
+                                throw new Error('Required parameters: Voltage (V), Back EMF (Eb), Armature Resistance (Ra), Series Resistance (Rse)');
+                            }
+                            formula = 'I = (V - Eb) / (Ra + Rse)';
+                            result = (values.voltage - values.backEmf) / (values.armatureResistance + values.seriesResistance);
+                            steps.push(`I = (${values.voltage} - ${values.backEmf}) / (${values.armatureResistance} + ${values.seriesResistance})`);
+                        }
+                        steps.push(`Current = ${result.toFixed(3)} A`);
+                        break;
+
+                    case 'fieldCurrent':
+                        if (motorType !== 'shunt') {
+                            throw new Error('Field current calculation only applicable for shunt motors');
+                        }
+                        if (!values.voltage || !values.fieldResistance) {
+                            throw new Error('Required parameters: Voltage (V), Field Resistance (Rf)');
+                        }
+                        formula = 'If = V / Rf';
+                        result = values.voltage / values.fieldResistance;
+                        steps.push(`If = ${values.voltage} / ${values.fieldResistance}`);
+                        steps.push(`If = ${result.toFixed(3)} A`);
+                        break;
+
+                    default:
+                        throw new Error('Invalid parameter selected');
+                }
+
+                return {
+                    value: result,
+                    formula: formula,
+                    steps: steps,
+                    unit: this.getUnit(calculateParam)
+                };
+            }
+
+            getUnit(parameter) {
+                const units = {
+                    'backEmf': 'V',
+                    'mechanicalPower': 'W',
+                    'torque': 'N-m',
+                    'speed': 'RPM',
+                    'armatureCurrent': 'A',
+                    'fieldCurrent': 'A'
+                };
+                return units[parameter] || '';
+            }
+
+            showResults(result, parameter, motorType) {
+                const parameterNames = {
+                    'backEmf': 'Back EMF',
+                    'mechanicalPower': 'Mechanical Power',
+                    'torque': 'Torque',
+                    'speed': 'Speed',
+                    'armatureCurrent': 'Armature Current',
+                    'fieldCurrent': 'Field Current'
+                };
+
+                this.resultsContent.innerHTML = `
+                    <div class="results-section">
+                        <h2><i class="fas fa-check-circle"></i> Calculation Results</h2>
+                        <div class="result-value">
+                            ${parameterNames[parameter]}: ${result.value.toFixed(3)} ${result.unit}
+                        </div>
+                        <div class="calculation-steps">
+                            <h4><i class="fas fa-list-ol"></i> Formula Used:</h4>
+                            <div class="step">${result.formula}</div>
+                            <h4><i class="fas fa-calculator"></i> Step-by-step Solution:</h4>
+                            ${result.steps.map(step => `<div class="step">${step}</div>`).join('')}
+                        </div>
+                    </div>
+                `;
+
+                this.resultsCard.classList.remove('hidden');
+                this.hideError();
+            }
+
+            showError(message) {
+                this.errorMessage.textContent = message;
+                this.errorCard.classList.remove('hidden');
+                this.hideResults();
+            }
+
+            hideError() {
+                this.errorCard.classList.add('hidden');
+            }
+
+            hideResults() {
+                this.resultsCard.classList.add('hidden');
+            }
+
+            reset() {
+                // Reset all form inputs
+                Object.values(this.inputs).forEach(input => {
+                    input.value = '';
+                });
+
+                // Reset selects
+                this.motorTypeSelect.value = '';
+                this.calculateParameter.value = '';
+
+                // Hide sections
+                this.hideMotorInfo();
+                this.parametersGrid.style.display = 'none';
+                this.calculationCard.style.display = 'none';
+                this.hideResults();
+                this.hideError();
+            }
+
+            loadExample() {
+                const motorType = this.motorTypeSelect.value;
+                if (!motorType) {
+                    this.showError('Please select a motor type first');
+                    return;
+                }
+
+                const example = this.examples[motorType];
+
+                // Load example values
+                if (example.voltage) this.inputs.voltage.value = example.voltage;
+                if (example.armatureResistance) this.inputs.armatureResistance.value = example.armatureResistance;
+                if (example.fieldResistance) this.inputs.fieldResistance.value = example.fieldResistance;
+                if (example.seriesResistance) this.inputs.seriesResistance.value = example.seriesResistance;
+                if (example.poles) this.inputs.poles.value = example.poles;
+                if (example.conductors) this.inputs.conductors.value = example.conductors;
+                if (example.parallelPaths) this.inputs.parallelPaths.value = example.parallelPaths;
+                if (example.speed) this.inputs.speed.value = example.speed;
+                if (example.flux) this.inputs.flux.value = example.flux;
+
+                this.hideError();
+                this.hideResults();
+            }
+        }
+
+        // Initialize the calculator when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new DCMotorCalculator();
+        });
+    </script>
+</body>
+</html>
